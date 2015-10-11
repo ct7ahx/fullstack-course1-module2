@@ -20,13 +20,15 @@ class LineAnalyzer
 
   def calculate_word_frequency
     counts = Hash.new(0)
-    words = content.split(" ").sort
+    words = content.downcase.split(" ").sort
     for word in words
       counts[word] += 1
     end
-    maior = counts.max_by{|k,v| v}
-    @highest_wf_words = maior[0]
-    @highest_wf_count = maior[1]
+    @highest_wf_count = counts.max_by{|k,v| v}[1]
+    @highest_wf_words = []
+    @highest_wf_words = counts.select{|k,v| v == @highest_wf_count}.keys
+    #puts "CHAVES #{@line_number} #{@highest_wf_words}"
+    #puts @highest_wf_count
   end
 
   #Implement the initialize() method to:
@@ -52,6 +54,7 @@ class Solution
 
   def initialize
     @analyzers = Array.new
+    @linhas = Array.new
   end
 
   # Implement the following methods in the Solution class.
@@ -83,16 +86,27 @@ class Solution
   def calculate_line_with_highest_frequency()
     maximo = @analyzers.max_by(&:highest_wf_count)
     @highest_count_across_lines = maximo.highest_wf_count
-    @highest_count_words_across_lines = Array.new
-    @analyzers.each do |analyzed| 
-      @highest_count_words_across_lines << analyzed.highest_wf_words
+    @highest_count_words_across_lines = []
+    @analyzers.each do |linha|
+      if linha.highest_wf_count == @highest_count_across_lines
+        @highest_count_words_across_lines << linha
+      end
     end
+    #puts "maximo dos maximos: #{@highest_count_across_lines}#{highest_count_words_across_lines.flatten}"
+    #@highest_count_words_across_lines = Array.new
+    #@analyzers.each do |analyzed| 
+    #  @highest_count_words_across_lines << analyzed.highest_wf_words
+    #end
   end
 
   #Implement the print_highest_word_frequency_across_lines() method to
   #* print the result in the following format
   def print_highest_word_frequency_across_lines()
-    puts "[\"#{highest_count_words_across_lines}\"] (appears in line#)"
+    puts "The following words have the highest word frequency per line:"
+    @highest_count_words_across_lines.each do |line|
+      puts "#{line.highest_wf_words} (appears in line #{line.line_number})"
+    end
+    #puts "[\"#{highest_count_words_across_lines}\"] (appears in line#)"
   end
 end
 
